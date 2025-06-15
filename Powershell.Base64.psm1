@@ -1,3 +1,29 @@
+<#
+.SYNOPSIS
+Converts input to a Base64 String. This function is intended to support explicit typing of the input text via an encoding parameter. In most cases UTF8 should be used. However, support for ASCII and Unicode are included for one-way conversions to or from Base64 for sake of usability, if required.
+
+.PARAMETER String
+The user-supplied string to convert to Base64.
+
+.PARAMETER Encoding
+The explicit encoding of the supplied input. In many cases is not necesarry, but can be useful if working with different character encodings.
+
+.EXAMPLE 
+# Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII
+ConvertTo-Base64 -String "Hello World!" -Encoding "ASCII"
+
+.EXAMPLE
+# Convert the string "Привіт, світ!" to Base64 while explicitly specifying the supplied text encoding as UTF8. UTF8 is the default switch parameter, so this is not necesarry but is provided for sake of example.
+ConvertTo-Base64 -String "Привіт, світ!" -Encoding "UTF8"
+
+.EXAMPLE
+# Convert the Base64 string, "0J/RgNC40LLRltGCLCDRgdCy0ZbRgiE=" to UTF8 text while explicitly specifying UTF8 Encoding.
+ConvertFrom-Base64 -Base64String "0J/RgNC40LLRltGCLCDRgdCy0ZbRgiE=" -Encoding "UTF8"
+
+.EXAMPLE 
+# Convert the Base64 string, "PwRABDgEMgRWBEIEIABBBDIEVgRCBA==" to Unicode text while explicitly specifying Unicode encoding.
+ConvertFrom-Base64 -Base64String "PwRABDgEMgRWBEIEIABBBDIEVgRCBA==" -Encoding "Unicode"
+#>
 function ConvertTo-Base64 {
 
     [CmdletBinding()]
@@ -50,7 +76,7 @@ function ConvertFrom-Base64 {
                 throw "Valid input was not provided."
             }
             else {
-                Write-Warning "Input is not valide Base64."
+                Write-Warning "Input is not valid Base64."
             }
         }
     }    
