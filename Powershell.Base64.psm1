@@ -2,6 +2,8 @@
 .SYNOPSIS
 Converts input to a Base64 String. This function is intended to support explicit typing of the input text via an encoding parameter. In most cases UTF8 should be used. However, support for ASCII and Unicode are included for one-way conversions to or from Base64 for sake of usability, if required.
 
+.EXTERNALHELP "https://github.com/Cyber-Jacob/Powershell.Base64/blob/main/README.md"
+
 .PARAMETER String
 The user-supplied string to convert to Base64.
 
@@ -41,6 +43,8 @@ function ConvertTo-Base64String {
 <#
 .SYNOPSIS
 Converts input from a Base64 String. This function is intended to support explicit typing of the input text via an encoding parameter. In most cases UTF8 should be used. However, support for ASCII and Unicode are included for one-way conversions to or from Base64 for sake of usability, if required.
+
+.EXTERNALHELP "https://github.com/Cyber-Jacob/Powershell.Base64/blob/main/README.md"
 
 .PARAMETER String
 The user-supplied string to convert to Base64.

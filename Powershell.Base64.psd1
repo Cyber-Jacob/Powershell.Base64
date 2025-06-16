@@ -18,22 +18,22 @@ ModuleVersion = '1.0.0'
 # CompatiblePSEditions = @()
 
 # ID used to uniquely identify this module
-GUID = '6ed4cc1e-e775-4020-8d92-e923b7882e60'
+GUID = '9024c9d4-663b-429d-a795-20bf0cc06685'
 
 # Author of this module
 Author = 'Jacob Schweyer'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+# CompanyName = 'Unknown'
 
 # Copyright statement for this module
 Copyright = '(c) Jacob Schweyer. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'This Powershell module exists to convert to and from Base64 strings using UTF8, ASCII, and Unicode character encodings. For almost all cases, UTF8 - the default encoding option - should be used. However, the optional Encoding parameter is present for sake of functionality. '
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -72,7 +72,7 @@ Copyright = '(c) Jacob Schweyer. All rights reserved.'
 FunctionsToExport = '*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = 'ConvertTo-Base64', 'ConvertFrom-Base64'
+CmdletsToExport = 'ConvertTo-Base64String', 'ConvertFrom-Base64String'
 
 # Variables to export from this module
 VariablesToExport = '*'
@@ -123,7 +123,7 @@ PrivateData = @{
 } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-# HelpInfoURI = ''
+HelpInfoURI = 'https://github.com/Cyber-Jacob/Powershell.Base64/blob/main/README.md'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
