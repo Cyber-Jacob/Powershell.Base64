@@ -4,7 +4,7 @@ This Powershell module exists to convert to and from Base64 strings using UTF8, 
 ## Usage
 ``` Powershell
 
-# Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII
+# Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII.
 ConvertTo-Base64String -String "Hello World!" -Encoding "ASCII"
 
 # Convert the string "Привіт, світ!" to Base64 while explicitly specifying the supplied text encoding as UTF8. UTF8 is the default switch parameter, so this is not necesarry but is provided for sake of example.

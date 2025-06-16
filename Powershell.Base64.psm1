@@ -9,7 +9,7 @@ The user-supplied string to convert to Base64.
 The explicit encoding of the supplied input. In many cases is not necesarry, but can be useful if working with different character encodings.
 
 .EXAMPLE
-# Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII
+# Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII.
 ConvertTo-Base64String -String "Hello World!" -Encoding "ASCII"
 
 .EXAMPLE
