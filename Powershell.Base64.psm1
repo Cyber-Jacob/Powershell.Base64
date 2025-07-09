@@ -19,25 +19,66 @@ ConvertTo-Base64String -String "Hello World!" -Encoding "ASCII"
 ConvertTo-Base64String -String "Привіт, світ!" -Encoding "UTF8"
 #>
 function ConvertTo-Base64String {
+    [CmdletBinding(DefaultParameterSetName='String')]
     [OutputType([string])]
-    [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName='String', ValueFromPipeline=$true)]
         [string]$String,
 
-        [Parameter()]
+        [Parameter(ParameterSetName='String')]
         [ValidateSet('UTF8', 'ASCII', 'Unicode')]
-        [string]$Encoding = 'UTF8'
+        [string]$Encoding = 'UTF8',
+
+        [Parameter(Mandatory, Position=0, ParameterSetName='File', ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('PSPath')]
+        [ValidateScript({Test-Path $_ -PathType Leaf})]
+        [string]$Path,
+
+        [Parameter(ParameterSetName='File')]
+        [string]$OutFile,
+
+        [Parameter(ParameterSetName='File')]
+        [switch]$NoLineBreaks       #Insert CRLF every 76 chars per RFC2045; MIME encoded email expects this
     )
 
     process {
-        switch ($Encoding) {
-            'UTF8'      {$encodebytes = [System.Text.Encoding]::UTF8.GetBytes($String)}
-            'ASCII'     {$encodebytes = [System.Text.Encoding]::ASCII.GetBytes($String)}
-            'Unicode'   {$encodebytes = [System.Text.Encoding]::Unicode.GetBytes($String)}
+        switch($PSCmdlet.ParameterSetName) {
+            
+            'String' {
+                $encodebytes = switch ($Encoding) {
+            'UTF8'      {[System.Text.Encoding]::UTF8.GetBytes($String)}
+            'ASCII'     {[System.Text.Encoding]::ASCII.GetBytes($String)}
+            'Unicode'   {[System.Text.Encoding]::Unicode.GetBytes($String)}
         }
         [Convert]::ToBase64String($encodebytes)
     }
+            'File' {
+                $fileitem = Get-Item -LiteralPath $Path
+                $bytes = if ($fileitem.length -GT 500MB) {
+                    $in = [IO.File]::OpenRead($Path)
+                    try {
+                        $out = New-Object IO.MemoryStream
+                        $cryptostream = New-Object Security.Cryptography.CryptoStream($out, (New-Object Security.Cryptography.ToBase64Transform),[IO.CryptoStreamMode]::Write)
+                        $in.CopyTo($cryptostream); $cryptostream.FlushFinalBlock()
+                        $out.ToArray()
+                    } finally {$in.Dispose(); $cryptostream.Dispose(); $out.Dispose() }
+                } else {
+                    [IO.File]::ReadAllBytes($Path)
+                } 
+
+                $options = if ($NoLineBreaks) {
+                    [Convert]::ToBase64String($bytes)
+                } else {
+                    [Convert]::ToBase64String($bytes,[System.Base64FormattingOptions]::InsertLineBreaks)
+                }
+
+                if ($OutFile) { [IO.File]::WriteAllText($OutFile,$options)}
+                $options
+
+            }
+            
+    }
+}
 }
 
 <#
@@ -65,38 +106,55 @@ ConvertFrom-Base64String -Base64String "PwRABDgEMgRWBEIEIABBBDIEVgRCBA==" -Encod
 #>
 
 function ConvertFrom-Base64String {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='String')]
     [OutputType([string])]
     param(
-        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$true, Position=0, ParameterSetName='String', ValueFromPipeline=$true)]
         [string]$Base64String,
 
-        [Parameter()]
+        [Parameter(ParameterSetName='String')]
         [ValidateSet('UTF8', 'ASCII', 'Unicode')]
         [string]$Encoding = 'UTF8',
 
-        [Parameter()]
-        [Switch]$ErrorOnInvalidInput
+        [Parameter(ParameterSetName='String')]
+        [Switch]$ErrorOnInvalidInput,
+
+        [Parameter(Mandatory, Position=0, ParameterSetName='File', ValueFromPipelineByPropertyName)]
+        [ValidateScript({Test-Path $_ -PathType Leaf})]
+        [string]$Path,
+
+        [Parameter(Mandatory, Position=1, ParametersetName='File')]
+        [string]$OutFile
     )
     process {
-        try {
-            $OutputBytes = [Convert]::FromBase64String($Base64String)
-            switch ($Encoding) {
-                'UTF8'      {[System.Text.Encoding]::UTF8.GetString($OutputBytes)}
-                'ASCII'     {[System.Text.Encoding]::ASCII.GetString($OutputBytes)}
-                'Unicode'   {[System.Text.Encoding]::Unicode.GetString($OutputBytes)}
-            }
-        }
-        catch {
-            if ($ErrorOnInvalidInput) {
-                throw "Valid input was not provided."
-            }
-            else {
-                Write-Warning "Input is not valid Base64."
+        switch ($PSCmdlet.ParameterSetName) {
+            'String' {
+                try {
+                    $OutputBytes = [Convert]::FromBase64String($Base64String)
+                } catch {
+                    if ($ErrorOnInvalidInput) {
+                        throw "Valid input was not provided."
+                    }
+                    else {
+                        Write-Warning "Input is not valid Base64."
+                        return
+                    }
+                }
+                switch ($Encoding) {
+                    'UTF8'      {[System.Text.Encoding]::UTF8.GetString($OutputBytes)}
+                    'ASCII'     {[System.Text.Encoding]::ASCII.GetString($OutputBytes)}
+                    'Unicode'   {[System.Text.Encoding]::Unicode.GetString($OutputBytes)}
+                }
+                }
+            'File'{
+                $b64 = Get-Content -LiteralPath $Path -Raw
+                try { $bytes = [Convert]::FromBase64String($b64) }
+                catch { throw "File does not contain valid Base-64." }
+                [IO.file]::WriteAllBytes($OutFile,$bytes)
             }
         }
     }
 }
 
-Export-ModuleMember -Function ConvertTo-Base64String
-Export-ModuleMember -Function ConvertFrom-Base64String
+
+Export-ModuleMember -Function ConvertTo-Base64String,ConvertFrom-Base64String
