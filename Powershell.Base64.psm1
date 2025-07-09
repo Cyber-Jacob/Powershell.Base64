@@ -123,8 +123,12 @@ function ConvertFrom-Base64String {
         [ValidateScript({Test-Path $_ -PathType Leaf})]
         [string]$Path,
 
+        [Parameter(ParameterSetName='String')]
         [Parameter(Mandatory, Position=1, ParametersetName='File')]
-        [string]$OutFile
+        [string]$OutFile,
+
+        [Parameter(ParameterSetName='String')]
+        [switch]$PassThru
     )
     process {
         switch ($PSCmdlet.ParameterSetName) {
@@ -133,17 +137,25 @@ function ConvertFrom-Base64String {
                     $OutputBytes = [Convert]::FromBase64String($Base64String)
                 } catch {
                     if ($ErrorOnInvalidInput) {
-                        throw "Valid input was not provided."
+                        throw "Input is not valid Base64."
                     }
                     else {
                         Write-Warning "Input is not valid Base64."
                         return
                     }
                 }
-                switch ($Encoding) {
-                    'UTF8'      {[System.Text.Encoding]::UTF8.GetString($OutputBytes)}
-                    'ASCII'     {[System.Text.Encoding]::ASCII.GetString($OutputBytes)}
-                    'Unicode'   {[System.Text.Encoding]::Unicode.GetString($OutputBytes)}
+
+                if ($OutFile) { [IO.File]::WriteallBytes($OutFile,$OutputBytes) }
+
+                if ($PassThru) {
+                    return ,$OutputBytes
+                }
+                elseif (-not $OutFile) {
+                    switch ($Encoding) {
+                        'UTF8'      {[System.Text.Encoding]::UTF8.GetString($OutputBytes)}
+                        'ASCII'     {[System.Text.Encoding]::ASCII.GetString($OutputBytes)}
+                        'Unicode'   {[System.Text.Encoding]::Unicode.GetString($OutputBytes)}
+                    }
                 }
                 }
             'File'{
