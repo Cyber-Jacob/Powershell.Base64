@@ -1,4 +1,5 @@
 # Powershell.Base64 Module
+![Powershell.Base64 Logo](./Assets/B64-Logo-2.png "Powershell.Base64 Logo")
 This Powershell module exists to convert to and from Base64 strings using UTF8, ASCII, and Unicode character encodings. For almost all cases, UTF8 - the default encoding option - should be used. However, the optional Encoding parameter is present for sake of functionality. 
 
 ## Usage
