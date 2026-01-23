@@ -5,6 +5,9 @@ This Powershell module exists to convert to and from Base64 strings using UTF8, 
 ## Usage
 ``` Powershell
 
+# Convert a Base64 blob for an image into an image file
+ConvertFrom-Base64String -Base64String $b64imagestring -OutFile ./image.png
+
 # Convert the string, "Hello, World!" to Base64 while explicitly specifying the supplied text encoding as ASCII.
 ConvertTo-Base64String -String "Hello World!" -Encoding "ASCII"
 
